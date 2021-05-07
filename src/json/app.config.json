@@ -1,0 +1,10 @@
+{
+    "counters": [
+        "Amy",
+        "Bob"
+    ],
+    "processTimeRangeSec": {
+        "from": 0.5,
+        "to": 1
+    }
+}
