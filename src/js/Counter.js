@@ -7,22 +7,29 @@ const Counter = props => {
 
     const [processedNumberArr, setProcessedNumberArr] = useState([])
 
+    useEffect(() => {
+        if (processingNumber) {
+            processedNumberArr.push(processingNumber)
+            setProcessedNumberArr(processedNumberArr)
+        }  
+    }, [processingNumber])
+
     return (
-        <div id="counter">
-            <div className="title">
+        <tr id="counter">
+            <td className="title">
                 {name}
-            </div>
-            <div className="content">
+            </td>
+            <td className="status">
                 {
                     processingNumber ?? "IDLE" 
                 }
-            </div>
-            <div className="content">
+            </td>
+            <td className="content" colSpan="2">
                 {
-                    processedNumberArr.join(",")
+                    processedNumberArr.filter(n => n !== processingNumber).join(",")
                 }
-            </div>
-        </div>
+            </td>
+        </tr>
     )
 }
 

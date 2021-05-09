@@ -1,5 +1,37 @@
 #app {
     &, &::before, &::after {
         box-sizing: border-box;
+        font-family: sans-serif;
+    }
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    .button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 5vh;
+        border-radius: 4px;
+        border: 1px solid black;
+        text-align: center;
+        padding: 2px;
+        margin: 10px;
+
+        &:hover {
+            cursor: pointer;
+            opacity: 0.5;
+            box-shadow: 0px 0px 20px black;
+        }
+
+        &:active {
+            transition: all 0.5s;
+            transform: scale(0.5, 0.8);
+        }
+
     }
 }
+
+@import './counterManager.less';
+@import './counter.less';

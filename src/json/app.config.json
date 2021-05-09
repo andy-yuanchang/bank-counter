@@ -1,7 +1,21 @@
 {
     "counters": [
         "Amy",
-        "Bob"
+        "Bob",
+        "Harry",
+        "Tina",
+        "Vanessa",
+        "Tony",
+        "Bob",
+        "Ian",
+        "Amy",
+        "Bob",
+        "Harry",
+        "Tina",
+        "Vanessa",
+        "Tony",
+        "Bob",
+        "Ian"
     ],
     "processTimeRangeSec": {
         "from": 0.5,

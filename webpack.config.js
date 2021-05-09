@@ -4,15 +4,16 @@ const express = require('express')
 const app = express()
 const apiRoutes = express.Router()
 const fs = require('fs')
-
-
-const devMode = process.env.NODE_ENV !== 'production'
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const { dirname } = require('path')
 
 const cfg = {
-    entry: './src/js/app.js',
+    entry: {
+        'bundle': ['./src/js/app.js']
+    } ,
     output: {
-        path: path.join(__dirname, './dist'),
-        filename: 'bundle.js'
+        path: path.resolve(__dirname, 'dist'),
+        filename: '[name].js'
     },
     mode: "development",
     resolve: {
@@ -30,18 +31,11 @@ const cfg = {
             },
             {
                 test: /\.less$/,
-                use: [
-                    'style-loader',
-                    'css-loader',
-                    'less-loader'
-                ]
+                use: [MiniCssExtractPlugin.loader, 'css-loader', 'less-loader']
             },
             {
                 test: /\.css$/,
-                use: [
-                    'style-loader',
-                    'css-loader'
-                ]
+                use: [MiniCssExtractPlugin.loader, 'css-loader']
             },
             {
                 test: /\.(png|woff|woff2|eot|ttf|svg)(\?.+)?$/,
@@ -54,6 +48,7 @@ const cfg = {
         ]
     },
     devServer: {
+        contentBase: __dirname,
         port: 8080,
         before: (app, server) => {
             app.get('/api/config', function(req, res) {
@@ -62,11 +57,10 @@ const cfg = {
             });
         },
         https: false
-    }
-}
-
-if (!devMode) {
-
+    },
+    plugins: [
+        new MiniCssExtractPlugin(),
+    ]
 }
 
 module.exports = cfg

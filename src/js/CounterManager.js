@@ -9,12 +9,13 @@ let processTimeRange = {
     to: 1.5
 }
 
+let unProcessedQueue = []
+let availableCounterArr = []
+
 const CounterManager = props => {
 
     const { waitingNumber } = props
 
-    const [unProcessedQueue, setUnProcessedQueue] = useState([])
-    const [availableCounterArr, setAvailableCounterArr] = useState([])
     const [counterInfoArr, setCounterInfoArr] = useState([])
 
     useEffect(() => {
@@ -34,10 +35,9 @@ const CounterManager = props => {
                         }
                     })
                     setCounterInfoArr(countersArr)
-                    let initialAvailabaleCounterArr = countersArr.map((counter, index) => {
+                    availableCounterArr = countersArr.map((counter, index) => {
                         return index
                     })
-                    setAvailableCounterArr(initialAvailabaleCounterArr)
                 })
                 .catch(error => {
                     console.error("get app config error", error)
@@ -50,6 +50,15 @@ const CounterManager = props => {
 
     useEffect(() => {
 
+        const resetCounterStatus = (counterIndex) => {
+            setCounterInfoArr(preCounterInfoArr => {
+                const [...arr] = preCounterInfoArr
+                arr[counterIndex].processingNumber = null
+                return arr
+            })
+            availableCounterArr.push(counterIndex)
+        }
+
         const processing = (counterIndex) => {
             const interval = processTimeRange.to - processTimeRange.from
             const base = processTimeRange.from
@@ -57,25 +66,11 @@ const CounterManager = props => {
             setTimeout(() => {
                 const isUnProcessedQueueEmpty = unProcessedQueue.length === 0
                 if (isUnProcessedQueueEmpty) {
-                    setCounterInfoArr(preCounterInfoArr => {
-                        preCounterInfoArr[counterIndex] = {
-                            ...preCounterInfoArr[counterIndex],
-                            processingNumber: null
-                        }
-                        return preCounterInfoArr
-                    })
-                    setAvailableCounterArr(prevAvailableCounterArr => {
-                        return [...prevAvailableCounterArr, counterIndex]
-                    })
+                    resetCounterStatus(counterIndex)
                     return
                 }
 
                 const number = unProcessedQueue.shift()
-                setUnProcessedQueue(preUnProcessedQueue => {
-                    let [done, ...remain] = preUnProcessedQueue
-                    console.log(`${remain} remain`)
-                    return remain
-                })
                 assignTaskToCounter(counterIndex, number)
 
             }, timeoutMs)
@@ -83,44 +78,54 @@ const CounterManager = props => {
 
         const assignTaskToCounter = (counterIndex, number) => {
             setCounterInfoArr(preCounterInfoArr => {
-                preCounterInfoArr[counterIndex] = {
-                    ...preCounterInfoArr[counterIndex],
-                    processingNumber: number
-                }
-                return preCounterInfoArr
+                const [...arr] = preCounterInfoArr
+                arr[counterIndex].processingNumber = number
+                return arr
             })
 
             processing(counterIndex)
         }
 
         const hasAvailableCounter = availableCounterArr.length !== 0
+        const isUnProcessedQueueEmpty = unProcessedQueue.length === 0
+        const shouldAssignTask = hasAvailableCounter && isUnProcessedQueueEmpty
 
-        if (hasAvailableCounter) {
+        if (waitingNumber === 0) return
+        if (shouldAssignTask) {
             const counterIndex = availableCounterArr.shift()
-            setUnProcessedQueue(prevUnProcessedQueue => {
-                return [...prevUnProcessedQueue, waitingNumber]
-            })
-            const number = unProcessedQueue.shift()
-            assignTaskToCounter(counterIndex, number)
+            assignTaskToCounter(counterIndex, waitingNumber)
             return
         }
-        setUnProcessedQueue(prevUnProcessedQueue => {
-            return [...prevUnProcessedQueue, waitingNumber]
-        })
+
+        unProcessedQueue.push(waitingNumber)
+
     }, [waitingNumber])
 
     return (
-         <div id="counter-manager">
-            {
-                counterInfoArr.map(counterInfo => {
-                    return (
-                        <Counter
-                            name={counterInfo.name}
-                            processingNumber={counterInfo.processingNumber}
-                        />
-                    )
-                })
-            }
+        <div id="counter-manager">
+            <div className="un-processed-queue">
+                {`Number of waiting people: ${unProcessedQueue.length}`}
+            </div>
+            <table className="table">
+                <thead>
+                    <th colspan="1">Counter Name</th>
+                    <th colspan="1">Number in Processing</th>
+                    <th colspan="2">Processed Number Queue</th>
+                </thead>
+                <tbody>
+                    {
+                        counterInfoArr.map(counterInfo => {
+                            return (
+                                <Counter
+                                    name={counterInfo.name}
+                                    processingNumber={counterInfo.processingNumber}
+                                />
+                            )
+                        })
+                    }
+                </tbody>
+            </table>
+
         </div>
     )
 }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
 import CounterManager from './CounterManager'
+import '../less/app.less'
 
 const App = () => {
 
@@ -15,7 +16,9 @@ const App = () => {
             <CounterManager
                 waitingNumber={counter}
             />
-            <button onClick={handleClickButton}>{`NEXT ${counter}`}</button>
+            <div className="button" onClick={handleClickButton}>
+                <p>{`NEXT ${counter}`}</p>
+            </div>
         </div>
     )
 }
