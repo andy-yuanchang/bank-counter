@@ -56,7 +56,8 @@ const cfg = {
                 res.json(JSON.parse(countersData));
             });
         },
-        https: false
+        https: false,
+        publicPath: '/dist'
     },
     plugins: [
         new MiniCssExtractPlugin(),
